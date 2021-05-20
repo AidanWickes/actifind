@@ -1,6 +1,5 @@
 import 'package:actifind/services/shared_prefs.dart';
 import 'package:actifind/views/authenticate/authenticate.dart';
-import 'package:actifind/views/wrapper.dart';
 import 'package:flutter/material.dart';
 
 //Import the firebase_core plugin

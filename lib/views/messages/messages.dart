@@ -94,13 +94,13 @@ class _MessagesViewState extends State<MessagesView> {
                       height: 30,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
-                        color: Colors.pink[50],
+                        color: Colors.green[50],
                       ),
                       child: Row(
                         children: [
                           Icon(
                             Icons.add,
-                            color: Colors.pink,
+                            color: Colors.green,
                             size: 20,
                           ),
                           SizedBox(

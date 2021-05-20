@@ -87,10 +87,18 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                       ),
                       Text(
-                        "Welcome!",
+                        "Welcome Back!",
                         style: TextStyle(
-                          fontSize: 48,
+                          fontSize: 36,
                           color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Sign in to continue",
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.grey,
                         ),
                       ),
                       Form(
