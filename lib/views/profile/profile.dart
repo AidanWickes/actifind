@@ -19,7 +19,6 @@ class _ProfileViewState extends State<ProfileView> {
   QuerySnapshot userSnapshot;
 
   _getUserDetails() {
-    //print(username);
     databaseMethods.getUserByUsername(username).then((value) {
       setState(() {
         userSnapshot = value;
@@ -34,8 +33,8 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   initState() {
     super.initState();
-    _getUserDetails();
     _getUser();
+    _getUserDetails();
   }
 
   Color hexToColor(String code) {
@@ -72,9 +71,43 @@ class _ProfileViewState extends State<ProfileView> {
         ),
         SizedBox(height: 20),
         Container(
-          width: MediaQuery.of(context).size.width - 50,
-          height: MediaQuery.of(context).size.height / 3,
-          color: Colors.black,
+          padding: EdgeInsets.all(8),
+          child: GestureDetector(
+            onTap: () {
+              authMethods.resetPassword(userSnapshot.docs[0].data()["email"]);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Sent password reset link to: " +
+                      userSnapshot.docs[0].data()["email"]),
+                ),
+              );
+            },
+            child: Container(
+              child: Text(
+                "Reset Password",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.all(8),
+          child: GestureDetector(
+            onTap: widget.onExit,
+            child: Container(
+              child: Text(
+                "Log out",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -85,22 +118,22 @@ class _ProfileViewState extends State<ProfileView> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Profile"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            onPressed: () {
-              authMethods.signOut();
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Authenticate(),
-                  ),
-                  (route) => false);
-              // Navigator.pushReplacement(context,
-              //     MaterialPageRoute(builder: (context) => Authenticate()));
-            },
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.exit_to_app),
+        //     onPressed: () {
+        //       authMethods.signOut();
+        //       Navigator.pushAndRemoveUntil(
+        //           context,
+        //           MaterialPageRoute(
+        //             builder: (context) => Authenticate(),
+        //           ),
+        //           (route) => false);
+        //       // Navigator.pushReplacement(context,
+        //       //     MaterialPageRoute(builder: (context) => Authenticate()));
+        //     },
+        //   ),
+        // ],
       ),
       body: Container(
         child: Center(child: user()),

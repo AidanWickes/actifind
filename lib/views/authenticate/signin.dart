@@ -75,9 +75,13 @@ class _SignInPageState extends State<SignInPage> {
                         child: Container(
                           width: 200,
                           height: 200,
-                          child: Icon(Icons.account_circle),
-                          decoration: BoxDecoration(
+                          child: Icon(
+                            Icons.account_circle,
                             color: Colors.green,
+                            size: 200,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
                             shape: BoxShape.circle,
                           ),
                         ),
