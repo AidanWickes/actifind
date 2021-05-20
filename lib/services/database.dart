@@ -15,7 +15,7 @@ class DatabaseMethods {
   getUserJoinedPosts(String username) async {
     return await FirebaseFirestore.instance
         .collection("posts")
-        .where("member", arrayContains: username)
+        .where("members", arrayContains: username)
         .get();
   }
 

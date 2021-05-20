@@ -143,22 +143,9 @@ class _PostsViewState extends State<PostsView> {
                                         onPressed: () async {
                                           //get document id
                                           //print(postSnapshot.docs[index].id);
-
-                                          List memberPosts = userSnapshot
-                                              .docs[0]
-                                              .data()["joinedposts"];
                                           List members = postSnapshot
                                               .docs[index]
                                               .data()["members"];
-
-                                          if (memberPosts.contains(
-                                              postSnapshot.docs[index].id)) {
-                                            memberPosts.remove(
-                                                postSnapshot.docs[index].id);
-                                          } else {
-                                            memberPosts.add(
-                                                postSnapshot.docs[index].id);
-                                          }
 
                                           if (members.contains(username)) {
                                             members.remove(username);
@@ -171,19 +158,6 @@ class _PostsViewState extends State<PostsView> {
                                           if (postSnapshot.docs[index]
                                                   .data()["creator"] ==
                                               username) {}
-
-                                          CollectionReference user =
-                                              FirebaseFirestore.instance
-                                                  .collection("users");
-
-                                          user
-                                              .doc(userSnapshot.docs[0].id)
-                                              .update(
-                                                  {"joinedposts": memberPosts})
-                                              .then((value) =>
-                                                  print("User Posts updated"))
-                                              .catchError((e) => print(
-                                                  "failed to update user: $e"));
 
                                           CollectionReference posts =
                                               FirebaseFirestore.instance

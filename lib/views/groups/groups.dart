@@ -12,112 +12,100 @@ class GroupsView extends StatefulWidget {
 
 class _GroupsViewState extends State<GroupsView> {
   DatabaseMethods databaseMethods = new DatabaseMethods();
-  QuerySnapshot postSnapshot;
   String username;
+  QuerySnapshot postSnapshot;
 
-  initiateList() {
-    databaseMethods.getUserJoinedPosts(username).then((value) {
-      postSnapshot = value;
-    });
-  }
-
-  Widget postList() {
-    return postSnapshot != null
-        ? RefreshIndicator(
-            onRefresh: _getData,
-            child: ListView.builder(
-                itemCount: postSnapshot.docs.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ViewPostView()));
-                    },
-                    child: Card(
-                      clipBehavior: Clip.antiAlias,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListTile(
-                            title:
-                                Text(postSnapshot.docs[index].data()["title"]),
-                            subtitle: Text(
-                              DateFormat('dd/MM/yyyy hh:mm a').format(
-                                  postSnapshot.docs[index]
-                                      .data()["datetime"]
-                                      .toDate()),
-                              style: TextStyle(
-                                color: Colors.black.withOpacity(0.6),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-          )
-        : Container(
-            child: Center(
-              child: Text(
-                "No Posts Found",
-              ),
-            ),
-          );
-  }
-
-  Future<void> _getData() async {
-    setState(() {
-//set loading bool to true
-      initiateList();
-//set loading bool to false when done
-    });
-  }
-
-  Future<void> _getUser() async {
+  Future<String> _getPosts() async {
     username = await SharedPrefFunctions.getUserNameSharedPreference();
-  }
-
-  @override
-  initState() {
-    super.initState();
-    initiateList();
-    _getUser();
+    //print(username);
+    databaseMethods.getUserJoinedPosts(username).then((value) {
+      setState(() {
+        postSnapshot = value;
+      });
+    });
+    return username;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("My Groups"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              print("tapped add button");
-            },
-          ),
-        ],
-      ),
-      body: Container(
-        padding: EdgeInsets.all(8),
-        //change to loading widget
-        child: Column(
-          children: [
-            Text(
-              "Joined Groups",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            postList(),
-          ],
+        appBar: AppBar(
+          title: Text("My Groups"),
         ),
-      ),
-    );
+        body: FutureBuilder<String>(
+          future: _getPosts(),
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            List<Widget> children;
+            if (snapshot.hasData) {
+              children = <Widget>[
+                ListView.builder(
+                    itemCount: postSnapshot.docs.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ViewPostView()));
+                        },
+                        child: Card(
+                          clipBehavior: Clip.antiAlias,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListTile(
+                                title: Text(
+                                    postSnapshot.docs[index].data()["title"]),
+                                subtitle: Text(
+                                  DateFormat('dd/MM/yyyy hh:mm a').format(
+                                      postSnapshot.docs[index]
+                                          .data()["datetime"]
+                                          .toDate()),
+                                  style: TextStyle(
+                                    color: Colors.black.withOpacity(0.6),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+              ];
+            } else if (snapshot.hasError) {
+              children = <Widget>[
+                const Icon(
+                  Icons.error_outline,
+                  color: Colors.red,
+                  size: 60,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text('Error: ${snapshot.error}'),
+                )
+              ];
+            } else {
+              children = const <Widget>[
+                SizedBox(
+                  child: CircularProgressIndicator(),
+                  width: 60,
+                  height: 60,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 16),
+                  child: Text('Awaiting result...'),
+                )
+              ];
+            }
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: children,
+              ),
+            );
+          },
+        ));
   }
 }
