@@ -1,7 +1,6 @@
 import 'package:actifind/services/auth.dart';
 import 'package:actifind/services/database.dart';
 import 'package:actifind/services/shared_prefs.dart';
-import 'package:actifind/views/authenticate/authenticate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -13,28 +12,19 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  String username;
   AuthMethods authMethods = new AuthMethods();
   DatabaseMethods databaseMethods = new DatabaseMethods();
+  String username;
   QuerySnapshot userSnapshot;
 
-  _getUserDetails() {
+  Future<String> _getUser() async {
+    username = await SharedPrefFunctions.getUserNameSharedPreference();
     databaseMethods.getUserByUsername(username).then((value) {
       setState(() {
         userSnapshot = value;
       });
     });
-  }
-
-  Future<void> _getUser() async {
-    username = await SharedPrefFunctions.getUserNameSharedPreference();
-  }
-
-  @override
-  initState() {
-    super.initState();
-    _getUser();
-    _getUserDetails();
+    return username;
   }
 
   Color hexToColor(String code) {
@@ -43,12 +33,18 @@ class _ProfileViewState extends State<ProfileView> {
     return new Color(int.parse(code.substring(1, 7), radix: 16) + 0xFF000000);
   }
 
-  Widget user() {
-    return Column(
-      children: [
-        Container(
-          child: Column(
-            children: [
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Profile"),
+      ),
+      body: FutureBuilder<String>(
+        future: _getUser(),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          List<Widget> children;
+          if (snapshot.hasData) {
+            children = <Widget>[
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: CircleAvatar(
@@ -66,77 +62,81 @@ class _ProfileViewState extends State<ProfileView> {
               ),
               Text(userSnapshot.docs[0].data()["name"]),
               Text(userSnapshot.docs[0].data()["email"]),
-            ],
-          ),
-        ),
-        SizedBox(height: 20),
-        Container(
-          padding: EdgeInsets.all(8),
-          child: GestureDetector(
-            onTap: () {
-              authMethods.resetPassword(userSnapshot.docs[0].data()["email"]);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Sent password reset link to: " +
-                      userSnapshot.docs[0].data()["email"]),
-                ),
-              );
-            },
-            child: Container(
-              child: Text(
-                "Reset Password",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.all(8),
-          child: GestureDetector(
-            onTap: widget.onExit,
-            child: Container(
-              child: Text(
-                "Log out",
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              SizedBox(height: 20),
+              Container(
+                padding: EdgeInsets.all(8),
+                child: GestureDetector(
+                  onTap: () {
+                    authMethods
+                        .resetPassword(userSnapshot.docs[0].data()["email"]);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Sent password reset link to: " +
+                            userSnapshot.docs[0].data()["email"]),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    child: Text(
+                      "Reset Password",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ),
+              Container(
+                padding: EdgeInsets.all(8),
+                child: GestureDetector(
+                  onTap: widget.onExit,
+                  child: Container(
+                    child: Text(
+                      "Log out",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ];
+          } else if (snapshot.hasError) {
+            children = <Widget>[
+              const Icon(
+                Icons.error_outline,
+                color: Colors.red,
+                size: 60,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text('Error: ${snapshot.error}'),
+              )
+            ];
+          } else {
+            children = const <Widget>[
+              SizedBox(
+                child: CircularProgressIndicator(),
+                width: 60,
+                height: 60,
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: Text('Awaiting result...'),
+              )
+            ];
+          }
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: children,
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Profile"),
-        // actions: [
-        //   IconButton(
-        //     icon: Icon(Icons.exit_to_app),
-        //     onPressed: () {
-        //       authMethods.signOut();
-        //       Navigator.pushAndRemoveUntil(
-        //           context,
-        //           MaterialPageRoute(
-        //             builder: (context) => Authenticate(),
-        //           ),
-        //           (route) => false);
-        //       // Navigator.pushReplacement(context,
-        //       //     MaterialPageRoute(builder: (context) => Authenticate()));
-        //     },
-        //   ),
-        // ],
-      ),
-      body: Container(
-        child: Center(child: user()),
+          );
+        },
       ),
     );
   }
