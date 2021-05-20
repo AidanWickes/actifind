@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1078987100433",
+    "project_id": "actifind-c38dd",
+    "storage_bucket": "actifind-c38dd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1078987100433:android:8adcbb318a06df473cbcb0",
+        "android_client_info": {
+          "package_name": "com.aidanwickes.actifind"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1078987100433-el6n0p9gsbfm5ospjar2353lf49tqppa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQKzCLbvE0XvhAVO9J4OdnugUrM48QA98"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1078987100433-el6n0p9gsbfm5ospjar2353lf49tqppa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
